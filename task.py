@@ -37,13 +37,18 @@ class Transaction:
         self.conn = conn
 
     @property
+    def table(self):
+        if not self._table:
+            self._table = sqlalchemy.Table(
+                'transactions',
+                sqlalchemy.Base.metadata,
+                autoload=True,
+                autoload_with=self.conn
+            )
+
+    @property
     def transaction_data(self):
-        self.table = sqlalchemy.Table(
-            'transactions',
-            sqlalchemy.Base.metadata,
-            autoload=True,
-            autoload_with=self.conn
-        )
+        pass
 
     def _begin_transaction(self):
         pass
