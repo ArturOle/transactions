@@ -5,28 +5,30 @@ from __init__ import (
 
 
 if __name__ == "__main__":
-    db = sqlite3.connect(DB_NAME)
-    db.execute(
-        """
-        CREATE TABLE accounts (
-            account_id INTEGER NOT NULL,
-            balance DECIMAL NOT NULL DEFAULT 0,
-            PRIMARY KEY(account_id),
-            CHECK(balance >= 0)
-        );
-        """
-    )
+    try:
+        con = sqlite3.connect(DB_NAME)
+        cursor_object = con.cursor()
+        cursor_object.executescript(
+            """
+            CREATE TABLE accounts (
+                account_id INTEGER NOT NULL,
+                balance DECIMAL NOT NULL DEFAULT 0,
+                PRIMARY KEY(account_id)
+            );
 
-    db.execute(
-        """
-        CREATE TABLE transaction (
-            transaction_id INT NOT NULL PRIMARY KEY,
-            account_from_id INTEGER NOT NULL,
-            account_to_id INTEGER NOT NULL,
-            amount DECIMAL NOT NULL, 
-            changed_time TEXT NOT NULL,
-            state TEXT NOT NULL
-        );
-        """
-    )
 
+            CREATE TABLE transactions (
+                transaction_id INTEGER NOT NULL,
+                account_from_id INTEGER NOT NULL,
+                account_to_id INTEGER NOT NULL,
+                amount DECIMAL NOT NULL,
+                changed_time TEXT NOT NULL,
+                transaction_state TEXT NOT NULL,
+                PRIMARY KEY(transaction_id),
+                FOREIGN KEY(account_from_id) REFERENCES accounts(account_id),
+                FOREIGN KEY(account_to_id) REFERENCES accounts(account_id)
+            );
+            """
+        )
+    except Exception as err:
+        print(err)

@@ -1,14 +1,15 @@
 from __init__ import (
-    sqlite3,
-    DB_NAME,
     LOG_FILE,
-    LOG_FORMAT
+    LOG_FORMAT,
+    DATABASE_PATH,
+    sqlalchemy
 )
 import logging
 
 
 class DBM:
     _db = None
+
     def __init__(self):
         logging.basicConfig(
             filename=LOG_FILE,
@@ -17,27 +18,32 @@ class DBM:
             datefmt='%H:%M:%S'
         )
 
-    def connect(self):
-        pass
-
     @property
     def db(self):
         if not self._db:
             return self._start_connection()
-        return self._db
+        return self.db
 
     def start_connection(self):
-        pass
+        self.db = sqlalchemy.create_engine(DATABASE_PATH)
+        return self.db
 
 
 class Transaction:
     _transaction_data = None
-    def __init__(self, conn: sqlite3.Connection):
+    _table = None
+
+    def __init__(self, conn):
         self.conn = conn
 
     @property
     def transaction_data(self):
-        pass
+        self.table = sqlalchemy.Table(
+            'transactions',
+            sqlalchemy.Base.metadata,
+            autoload=True,
+            autoload_with=self.conn
+        )
 
     def _begin_transaction(self):
         pass
